@@ -29,14 +29,15 @@
 
 struct fifo_Q{
 	int head, tail, q_size, q_max;
-	int * q_array;
+	char ** q_array;
 };
 
 struct fifo_Q * create_queue(unsigned q_max);
-void enqueue(struct fifo_Q * a_queue, int entry);
+int enqueue(struct fifo_Q * a_queue, char * entry);
 void dequeue(struct fifo_Q * a_queue);
 int q_is_empty(struct fifo_Q * a_queue);
 int q_is_full(struct fifo_Q * a_queue);
+char * copy(char * str);
 
 
 #endif

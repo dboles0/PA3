@@ -1,16 +1,18 @@
 #include "fifo_queue.h"
 
 
-// construct a queue with the given capacity
+// construct a queue with the provided max length
 // initialize q params
 // Time creation = O(1)
 struct fifo_Q * create_queue(unsigned q_max){
 	
 	struct fifo_Q * queue = (struct fifo_Q*) malloc(sizeof(struct fifo_Q));
 	queue->q_max = q_max;
+	queue->q_size = 0;
 	queue->head = -1;
 	queue->tail = -1;
-	queue->q_array = (int*) malloc(queue->q_max * sizeof(int));
+	queue->q_array = (char **) malloc(q_max * sizeof(char));
+	queue->q_array[q_max] = NULL; 
 	return queue;
 }
 
@@ -38,11 +40,11 @@ int q_is_full(struct fifo_Q * a_queue){
 
 // enqueue add to the queue
 // Time creation = O(1)
-void enqueue(struct fifo_Q * a_queue, int entry){
-
+int enqueue(struct fifo_Q * a_queue, char * entry){
+	
 	if(q_is_full(a_queue)){
-		printf("cannot add entry (%i)- queue is full\n", entry);
-		return;
+		printf("cannot add entry (%s)- queue is full\n", entry);
+		return 0;
 	}
 	else if(q_is_empty(a_queue)){
 		a_queue->head = 0;
@@ -51,8 +53,10 @@ void enqueue(struct fifo_Q * a_queue, int entry){
 	else {
 		a_queue->tail = ((a_queue->tail + 1) % a_queue->q_max);
 	}
-	a_queue->q_array[a_queue->tail] = entry;
+	if(a_queue->q_array[a_queue->tail] != NULL){ a_queue->q_array[a_queue->tail] = NULL; } 
+	a_queue->q_array[a_queue->tail] = copy(entry);
 	a_queue->q_size = a_queue->q_size + 1;
+	return 1;
 }
 
 // dequeue remove item form the queue
@@ -70,9 +74,17 @@ void dequeue(struct fifo_Q * a_queue){
 		a_queue->tail = -1;
 	}
 	else{
+		free(a_queue->q_array[a_queue->head]);
 		a_queue->q_array[a_queue->head] = 0;
 		a_queue->head = ((a_queue->head + 1) % a_queue->q_max);
 		a_queue->q_size = a_queue->q_size - 1;
 	}
+}
+
+char * copy(char * str){
+	int str_len = strlen(str);
+	char * ptr = (char *) malloc (str_len + 1 * sizeof(char));
+	memcpy(ptr, str, str_len);
+	return ptr;
 }
 

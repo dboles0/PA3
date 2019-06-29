@@ -75,7 +75,6 @@ void dequeue(struct fifo_Q * a_queue){
 	}
 	else{
 		free(a_queue->q_array[a_queue->head]);
-		a_queue->q_array[a_queue->head] = 0;
 		a_queue->head = ((a_queue->head + 1) % a_queue->q_max);
 		a_queue->q_size = a_queue->q_size - 1;
 	}

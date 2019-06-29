@@ -14,10 +14,10 @@ void test_cases(struct fifo_Q * test_queue, int max){
 	/*
 	* Test dequeue
 	*/
-	//test3_dequeue_one_element(test_queue, max);
-	//test4_dequeue_one_more_than_list(test_queue, max);
-	//test5_dequeue_wraparound(test_queue, max);
-	//test6_enqueue_dequeue_wraparound_overflow(test_queue, max);
+	test3_dequeue_one_element(test_queue, max);
+	test4_dequeue_one_more_than_list(test_queue, max);
+	test5_dequeue_wraparound(test_queue, max);
+	test6_enqueue_dequeue_wraparound_overflow(test_queue, max);
 
 	/*
 	* Test threads
@@ -32,15 +32,16 @@ void queue_state(struct fifo_Q * queue){
 	printf("head = %i\n", queue->head);
 	printf("tail = %i\n", queue->tail);
 	printf("q_size = %i\n", queue->q_size);
-	printf("total size of queue array = %d", strlen(queue->q_array));
-	/*
+	//printf("total size of queue array = %lu\n", strlen(*(queue->q_array)));
+	
+	printf("queue array = ");
 	for (int i=0; i < queue->q_size; i++){
 		if(queue->q_array[i] == '\0'){
 			printf("error - cannot access array[%d]", i);
 		}
 		else { printf("[%s]", queue->q_array[i]); }
 	}
-	*/
+	
 	printf("\n\n");
 }
 
@@ -94,7 +95,6 @@ void test1_enqueue(struct fifo_Q * test_queue, int max){
 	enqueue(test_queue, msg2); 
 	enqueue(test_queue, msg3); 
 
-	queue_state(test_queue);
 	q_error_check(test_queue, max, size, head, tail, test_array);
 }
 
@@ -129,29 +129,29 @@ void test2_enqueue_overflow(struct fifo_Q * test_queue, int max){
 	size = 10;
 	head = 0; 
 	tail = max - 1;
-	queue_state(test_queue);
-	//q_error_check(test_queue, max, size, head, tail, test_array);
+
+	q_error_check(test_queue, max, size, head, tail, test_array);
 }
-/*
+
 void test3_dequeue_one_element(struct fifo_Q * test_queue, int max){
 
-	int test_array[10] = {0, 30, 40, 1, 2, 3, 4, 5, 6, 7};
+	char * test_array[10] = {"10", "20", "30", "1", "2", "3", "4", "5", "6", "7"};
 	int size, head, tail;
 
 	// dequeue one element = [0][20][30][40]
-	printf("\"testing dequeue for [X][30][40][1][2][3][4][5][6][7] (q_size = %i)\"\n", max); 
+	printf("\"testing dequeue for [X][20][30][1][2][3][4][5][6][7] (q_size = %i)\"\n", max); 
 	dequeue(test_queue);
 	size = head = tail = 0;
 	size = 9;
 	head = 1; 
 	tail = max - 1;
-
+	
 	q_error_check(test_queue, max, size, head, tail, test_array);
 }
 
 void test4_dequeue_one_more_than_list(struct fifo_Q * test_queue, int max){
 
-	int test_array[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	char * test_array[10] = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
 	int size, head, tail;
 
 	// dequeue one more than list holds = [x][x][x][x][x] x
@@ -178,26 +178,39 @@ void test4_dequeue_one_more_than_list(struct fifo_Q * test_queue, int max){
 
 void test5_dequeue_wraparound(struct fifo_Q * test_queue, int max){
 
-	int test_array[10] = {1, 2, 13, 14, 15, 16, 17, 18, 19, 20};
+	char * test_array[10] = {"1", "2", "13", "14", "15", "16", "17", "18", "19", "20"};
 	int size, head, tail;
+	char msg1[] = { "1" };
+	char msg2[] = { "2" };
+	char msg3[] = { "3" };
+	char msg11[] = { "11" };
+	char msg12[] = { "12" };
+	char msg13[] = { "13" };
+	char msg14[] = { "14" };
+	char msg15[] = { "15" };
+	char msg16[] = { "16" };
+	char msg17[] = { "17" };
+	char msg18[] = { "18" };
+	char msg19[] = { "19" };
+	char msg20[] = { "20" };
 
 	// ensure wraparound using enqueue*5; dequeue*3; enqueue*2
-	printf("\"ensure wraparound = [1][2][13][14][15][16][17][18][19][20] (q_size = %i)\"\n", max); 
-	enqueue(test_queue, 11);
-	enqueue(test_queue, 12);
-	enqueue(test_queue, 13);
-	enqueue(test_queue, 14);
-	enqueue(test_queue, 15);
+	printf("\"wraparound test - enqueue*5 dequeue*3 enqueue*2 = [1][2][13][14][15][16][17][18][19][20] (q_size = %i)\"\n", max); 
+	enqueue(test_queue, msg11);
+	enqueue(test_queue, msg12);
+	enqueue(test_queue, msg13);
+	enqueue(test_queue, msg14);
+	enqueue(test_queue, msg15);
 	dequeue(test_queue);
 	dequeue(test_queue);
-	enqueue(test_queue, 16);
-	enqueue(test_queue, 17);
-	enqueue(test_queue, 18);
-	enqueue(test_queue, 19);
-	enqueue(test_queue, 20);
-	enqueue(test_queue, 1);
-	enqueue(test_queue, 2);
-	enqueue(test_queue, 3);
+	enqueue(test_queue, msg16);
+	enqueue(test_queue, msg17);
+	enqueue(test_queue, msg18);
+	enqueue(test_queue, msg19);
+	enqueue(test_queue, msg20);
+	enqueue(test_queue, msg1);
+	enqueue(test_queue, msg2);
+	enqueue(test_queue, msg3);
 
 	size = head = tail = 0;
 	size = 10;
@@ -209,11 +222,26 @@ void test5_dequeue_wraparound(struct fifo_Q * test_queue, int max){
 
 void test6_enqueue_dequeue_wraparound_overflow(struct fifo_Q * test_queue, int max){
 
-	int test_array[10] = {21, 22, 13, 14, 15, 16, 17, 18, 19, 20};
+	char * test_array[10] = {"21", "22", "13", "14", "15", "16", "17", "18", "19", "20"};
 	int size, head, tail;
 
+	char msg11[] = { "11" };
+	char msg12[] = { "12" };
+	char msg13[] = { "13" };
+	char msg14[] = { "14" };
+	char msg15[] = { "15" };
+	char msg16[] = { "16" };
+	char msg17[] = { "17" };
+	char msg18[] = { "18" };
+	char msg19[] = { "19" };
+	char msg20[] = { "20" };
+	char msg21[] = { "21" };
+	char msg22[] = { "22" };
+	char msg23[] = { "23" };
+
+
 	// ensure if wraparound overflow 
-	printf("\"ensure wraparound truncate (overflow 18) (q_size = %i)\"\n", max); 
+	printf("\"ensure truncate/wraparound (overwrite 12&13/overflow 23) (q_size = %i)\"\n", max); 
 	// clear queue
 	dequeue(test_queue);
 	dequeue(test_queue);
@@ -227,20 +255,21 @@ void test6_enqueue_dequeue_wraparound_overflow(struct fifo_Q * test_queue, int m
 	dequeue(test_queue);
 
 	// wraparound +1
-	enqueue(test_queue, 11);
-	enqueue(test_queue, 12);
-	enqueue(test_queue, 13);
-	enqueue(test_queue, 14);
-	enqueue(test_queue, 15);
+	enqueue(test_queue, msg11);
+	enqueue(test_queue, msg12);
+	enqueue(test_queue, msg13);
+	enqueue(test_queue, msg14);
+	enqueue(test_queue, msg15);
 	dequeue(test_queue);
 	dequeue(test_queue);
-	enqueue(test_queue, 16);
-	enqueue(test_queue, 17);
-	enqueue(test_queue, 18);
-	enqueue(test_queue, 19);
-	enqueue(test_queue, 20);
-	enqueue(test_queue, 21);
-	enqueue(test_queue, 22);
+	enqueue(test_queue, msg16);
+	enqueue(test_queue, msg17);
+	enqueue(test_queue, msg18);
+	enqueue(test_queue, msg19);
+	enqueue(test_queue, msg20);
+	enqueue(test_queue, msg21);
+	enqueue(test_queue, msg22);
+	enqueue(test_queue, msg23);
 
 	size = head = tail = 0;
 	size = 10;
@@ -249,5 +278,4 @@ void test6_enqueue_dequeue_wraparound_overflow(struct fifo_Q * test_queue, int m
 
 	q_error_check(test_queue, max, size, head, tail, test_array);
 }
-*/
 

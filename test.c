@@ -35,9 +35,9 @@ void queue_state(struct fifo_Q * queue){
 	//printf("total size of queue array = %lu\n", strlen(*(queue->q_array)));
 	
 	printf("queue array = ");
-	for (int i=0; i < queue->q_size; i++){
+	for (int i=0; i < queue->q_max; i++){
 		if(queue->q_array[i] == '\0'){
-			printf("error - cannot access array[%d]", i);
+			printf("\nerror - cannot access array[%d]\n", i);
 		}
 		else { printf("[%s]", queue->q_array[i]); }
 	}
@@ -135,11 +135,11 @@ void test2_enqueue_overflow(struct fifo_Q * test_queue, int max){
 
 void test3_dequeue_one_element(struct fifo_Q * test_queue, int max){
 
-	char * test_array[10] = {"10", "20", "30", "1", "2", "3", "4", "5", "6", "7"};
+	char * test_array[10] = {"0", "20", "30", "1", "2", "3", "4", "5", "6", "7"};
 	int size, head, tail;
 
 	// dequeue one element = [0][20][30][40]
-	printf("\"testing dequeue for [X][20][30][1][2][3][4][5][6][7] (q_size = %i)\"\n", max); 
+	printf("\"testing dequeue for [0][20][30][1][2][3][4][5][6][7] (q_size = %i)\"\n", max); 
 	dequeue(test_queue);
 	size = head = tail = 0;
 	size = 9;
@@ -154,8 +154,8 @@ void test4_dequeue_one_more_than_list(struct fifo_Q * test_queue, int max){
 	char * test_array[10] = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
 	int size, head, tail;
 
-	// dequeue one more than list holds = [x][x][x][x][x] x
-	printf("\"testing dequeue*max+1 (two dequeue over q_max) [X][X][X][X][X][X][X][X][X][X] (q_size = %i)\"\n", max); 
+	// dequeue one more than list holds = [0][0][0][0][0] 0
+	printf("\"testing dequeue*max+1 (two dequeue over q_max) [0][0][0][0][0][0][0][0][0][0] (q_size = %i)\"\n", max); 
 	dequeue(test_queue);
 	dequeue(test_queue);
 	dequeue(test_queue);

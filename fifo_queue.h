@@ -38,6 +38,7 @@ void dequeue(struct fifo_Q * a_queue);
 int q_is_empty(struct fifo_Q * a_queue);
 int q_is_full(struct fifo_Q * a_queue);
 char * copy(char * str);
+void clear_element(char * str);
 
 
 #endif

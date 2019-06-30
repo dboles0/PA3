@@ -13,6 +13,10 @@ struct fifo_Q * create_queue(unsigned q_max){
 	queue->tail = -1;
 	queue->q_array = (char **) malloc(q_max * sizeof(char));
 	queue->q_array[q_max] = NULL; 
+	for(int i=0; i< queue->q_max; i++){
+		queue->q_array[i] = copy("0");
+	}
+	queue->q_array[q_max] = NULL; 
 	return queue;
 }
 
@@ -53,7 +57,6 @@ int enqueue(struct fifo_Q * a_queue, char * entry){
 	else {
 		a_queue->tail = ((a_queue->tail + 1) % a_queue->q_max);
 	}
-	if(a_queue->q_array[a_queue->tail] != NULL){ a_queue->q_array[a_queue->tail] = NULL; } 
 	a_queue->q_array[a_queue->tail] = copy(entry);
 	a_queue->q_size = a_queue->q_size + 1;
 	return 1;
@@ -75,6 +78,7 @@ void dequeue(struct fifo_Q * a_queue){
 	}
 	else{
 		free(a_queue->q_array[a_queue->head]);
+		a_queue->q_array[a_queue->head] = copy("0");
 		a_queue->head = ((a_queue->head + 1) % a_queue->q_max);
 		a_queue->q_size = a_queue->q_size - 1;
 	}
@@ -87,3 +91,7 @@ char * copy(char * str){
 	return ptr;
 }
 
+void clear_element(char * str){
+	int str_len = strlen(str);
+	memset(str, 1, str_len);
+}

@@ -8,6 +8,7 @@ int main(int argc, char *argv[]){
 
 
 	// read parameters form the command line(section 4.1) with names
+	if(argc < MIN_ARGS)
 	// names of files to be processed
 	
 	// create queue

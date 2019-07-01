@@ -46,6 +46,11 @@ int q_is_full(struct fifo_Q * a_queue){
 // Time creation = O(1)
 int enqueue(struct fifo_Q * a_queue, char * entry){
 	
+	if(strlen(entry) > MAX_NAME_LENGTH){
+		// output to error file
+		printf("the input name is to large");
+		return 0;
+	}
 	if(q_is_full(a_queue)){
 		printf("cannot add entry (%s)- queue is full\n", entry);
 		return 0;

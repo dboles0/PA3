@@ -1,3 +1,14 @@
+/*
+ * File: test.h
+ * Author: Donald Boles
+ * Project: CSCI 3753 Programming Assignment 3
+ * Description:
+ * 	tests for porgram
+ */
+
+#ifndef TEST_H
+#define TEST_H
+
 #include "fifo_queue.h"
 
 void test_cases(struct fifo_Q * test_queue, int q_max);
@@ -12,3 +23,4 @@ void q_error_check(struct fifo_Q * test_queue, int defined_q_max, int size, int 
 void queue_state(struct fifo_Q * test_queue);
 
 
+#endif

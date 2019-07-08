@@ -29,13 +29,13 @@ void * parser_thread(void *ptr){
 		pthread_mutex_lock(&lock);
 
 
+		while(q_is_full(a_psr_info.Q) == 1){
+			pthread_cond_wait(&needs_less, &lock);
+		}
 
 		fgets(str, MAX_NAME_LENGTH, fp);
 		enqueue(a_psr_info.Q, str);
 
-		while(q_is_full(a_psr_info.Q) == 1){
-			pthread_cond_wait(&needs_less, &lock);
-		}
 		pthread_cond_signal(&needs_more);	
 		pthread_mutex_unlock(&lock);
 			
@@ -50,10 +50,9 @@ void * parser_thread(void *ptr){
 	free(file_path);
 	free(a_psr_info.file_name);
 
-	//pthread_mutex_unlock(&lock);
-
+	files_serviced += 1;
+	if(files_serviced == a_psr_info.num_input_files){ done = true; } 
 	// validate buffer has correct numbrer of elements
-	done = true;
 	pthread_exit(0);
 }
 

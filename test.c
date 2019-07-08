@@ -27,7 +27,7 @@ void test_cases(struct fifo_Q * test_queue, int max){
 }
 
 void queue_state(struct fifo_Q * queue){
-	if(q_is_empty(queue)) { printf(" (making new array...)\n"); }
+	if(q_is_empty(queue)) { printf("~~Empty Queue...~~\n"); }
 	printf("q_max = %i\n", queue->q_max);
 	printf("head = %i\n", queue->head);
 	printf("tail = %i\n", queue->tail);
@@ -35,7 +35,7 @@ void queue_state(struct fifo_Q * queue){
 	//printf("total size of queue array = %lu\n", strlen(*(queue->q_array)));
 	
 	printf("\nqueue array = {\n");
-	for (int i=0; i < queue->q_max; i++){
+	for (int i=0; i < queue->q_size; i++){
 		if(queue->q_array[i] == '\0'){
 			printf("\nerror - cannot access array[%d]\n", i);
 		}

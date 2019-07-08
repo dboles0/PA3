@@ -48,11 +48,11 @@ int enqueue(struct fifo_Q * a_queue, char * entry){
 	
 	if(strlen(entry) > MAX_NAME_LENGTH){
 		// output to error file
-		printf("the input name is to large");
+		printf("the input name is to large\n");
 		return 0;
 	}
 	if(q_is_full(a_queue)){
-		printf("queue is full cannot add entry %s", entry);
+		printf("queue is full cannot add entry %s\n", entry);
 		return 0;
 	}
 	else if(q_is_empty(a_queue)){
@@ -64,6 +64,7 @@ int enqueue(struct fifo_Q * a_queue, char * entry){
 	}
 	a_queue->q_array[a_queue->tail] = copy(entry);
 	a_queue->q_size = a_queue->q_size + 1;
+	
 	return 1;
 }
 

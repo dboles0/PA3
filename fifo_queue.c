@@ -52,7 +52,7 @@ int enqueue(struct fifo_Q * a_queue, char * entry){
 		return 0;
 	}
 	if(q_is_full(a_queue)){
-		printf("cannot add entry (%s)- queue is full\n", entry);
+		printf("queue is full cannot add entry %s", entry);
 		return 0;
 	}
 	else if(q_is_empty(a_queue)){

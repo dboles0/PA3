@@ -1,61 +1,88 @@
 #include "multi-lookup.h"
+#include "util.h"
 // open file in main and pass the pointer to producer 
 // to start this process. it then will give it a thread/file name 
 // it will read the file then proccess it to the queue
 // this will complete then exit the main program
 
+
 void * parser_thread(void *ptr){
 	
-	struct thread_info t_data = *((struct thread_info *) ptr);
+	struct parser_info a_psr_info = *((struct parser_info *) ptr);
 	FILE * fp;
-	char * file_path = "input/";
+	char * root = "input/";
+	char * file_path;
 
-	printf("%s\n", t_data.file_name);
-	struct fifo_Q * q = t_data.Q;
-	char str[MAX_NAME_LENGTH];                                   // string read form file
+	char str[MAX_NAME_LENGTH];                         // string read form file
 
-	// add file location to param
+	// save thread Id 
+	a_psr_info.thread_id = pthread_self();
 
-
-	concat(file_path, t_data.file_name);	
-	printf("file path = %s\n", t_data.file_name);
-	printf("queue = %s\n", t_data.Q->q_array[0]);
-	// repeadedly read line form given param(given file)
-	
+	//pthread_mutex_lock(&lock);
+	// add root file to file to service
+	file_path = concat(root, a_psr_info.file_name);	
 
 	fp = fopen(file_path, "r");
+	if(fp == NULL){ printf("error - opening file\n"); }
 	while(!feof(fp)){	
+
+		pthread_mutex_lock(&lock);
+
+
+
 		fgets(str, MAX_NAME_LENGTH, fp);
-		enqueue(q, str);
-		queue_state(q);
+		enqueue(a_psr_info.Q, str);
+
+		while(q_is_full(a_psr_info.Q) == 1){
+			pthread_cond_wait(&needs_less, &lock);
+		}
+		pthread_cond_signal(&needs_more);	
+		pthread_mutex_unlock(&lock);
+			
 	}
 	if(!feof(fp)){
 		perror("EOF error");
-	}
-
+	}	
 	// close file
 	fclose(fp);
 
-	//free(t_info);
+	// free all information instide the struct
+	free(file_path);
+	free(a_psr_info.file_name);
+
+	//pthread_mutex_unlock(&lock);
+
 	// validate buffer has correct numbrer of elements
+	done = true;
 	pthread_exit(0);
 }
 
-void * converter_thread(void *param){
+void * converter_thread(void *ptr){
+
+	struct converter_info a_conv_info = *((struct converter_info *) ptr);
+	a_conv_info.thread_id = pthread_self();
+
+	while(!done){
+		while(a_conv_info.Q->q_size > 0){
+			pthread_mutex_lock(&lock);
+			while(q_is_empty(a_conv_info.Q) == 1){
+				pthread_cond_wait(&needs_more, &lock);
+			}
+			dequeue(a_conv_info.Q);
+
+			pthread_cond_signal(&needs_less);	
+			pthread_mutex_unlock(&lock);
+		}
+	}
 	// removes the domain name form the shared array
+	//dnslookup(a_conv_info.Q->q_array[a_conv_info.Q->head], NULL, a_conv_info.Q->q_max);
+
 	// query the IP Address
 	// after name has been mapped to IP address write log
 	// if queue is empty block until new item or all parser threads have terminated
 	pthread_exit(0);
 }
 
-struct thread_info * create_thread_info(void){
-	struct thread_info * t_info = malloc(sizeof(struct thread_info));
-	t_info->Q = NULL;
-	t_info->file_name = malloc(5);
-	t_info->file_name = "info";
-	return t_info;	
-}
 
 char * concat(char * str1, char * str2){
 	char * ret = malloc(strlen(str1) + strlen(str2) + 1);

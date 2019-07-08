@@ -12,15 +12,27 @@
 #include "test.h"
 #include "fifo_queue.h"
 
-struct thread_info{
+extern pthread_mutex_t lock;
+extern pthread_cond_t needs_less;
+extern pthread_cond_t needs_more;
+extern bool done; 
+
+struct parser_info{
+	int thread_id;
+	int num_files_serviced;
 	struct fifo_Q * Q;		
 	char * file_name;
 
 };
 
+struct converter_info{
+	int thread_id;
+	struct fifo_Q * Q;		
+
+};
+
 void * parser_thread(void *ptr);
 void * converter_thread(void *param);
-struct thread_info * create_thread_info(void);
 char * concat(char * str1, char * str2);
 
 #endif

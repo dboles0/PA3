@@ -13,19 +13,21 @@
 // #define UTIL_DEBUG
 
 #include <stdlib.h>
-#include <pthread.h>
+#include <pthread.h>                   // therads
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <string.h>
 #include <errno.h>                     // handeling file error check
 #include <unistd.h>                    // usleep, 
+#include <stdbool.h>                   
 
 #define MIN_ARGS 1
 #define MAX_INPUT_FILES 10
 #define MAX_CONVERT_THREADS 10
 #define MAX_NAME_LENGTH 1025
 #define MAX_IP_LENGTH INET6_ADDRSTRLEN
+
 
 struct fifo_Q{
 	int head, tail, q_size, q_max;

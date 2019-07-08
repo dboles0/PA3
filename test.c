@@ -34,15 +34,15 @@ void queue_state(struct fifo_Q * queue){
 	printf("q_size = %i\n", queue->q_size);
 	//printf("total size of queue array = %lu\n", strlen(*(queue->q_array)));
 	
-	printf("queue array = ");
+	printf("\nqueue array = {\n");
 	for (int i=0; i < queue->q_max; i++){
 		if(queue->q_array[i] == '\0'){
 			printf("\nerror - cannot access array[%d]\n", i);
 		}
-		else { printf("[%s]", queue->q_array[i]); }
+		else { printf("%s", queue->q_array[i]); }
 	}
 	
-	printf("\n\n");
+	printf("}\n\n");
 }
 
 void q_error_check(struct fifo_Q * test_queue, int defined_q_max, int size, int head, int tail, char ** test_array){

@@ -12,13 +12,14 @@ void * parser_thread(void *ptr){
 	FILE * fp;
 	char * root = "input/";
 	char * file_path;
-
+	int i;
+	
 	char str[MAX_NAME_LENGTH];                         // string read form file
 
 	// save thread Id 
 	a_psr_info.thread_id = pthread_self();
 
-	//pthread_mutex_lock(&lock);
+	// pthread_mutex_lock(&lock);
 	// add root file to file to service
 	file_path = concat(root, a_psr_info.file_name);	
 
@@ -34,6 +35,9 @@ void * parser_thread(void *ptr){
 		}
 
 		fgets(str, MAX_NAME_LENGTH, fp);
+		i = 0;
+		i = strlen(str);
+		str[i-1] = '\0';
 		enqueue(a_psr_info.Q, str);
 
 		pthread_cond_signal(&needs_more);	
@@ -58,27 +62,41 @@ void * parser_thread(void *ptr){
 
 void * converter_thread(void *ptr){
 
+	FILE * fp;
 	struct converter_info a_conv_info = *((struct converter_info *) ptr);
+	char ipstr[MAX_IP_LENGTH];                                             // ip address
+	char * domain; 
 	a_conv_info.thread_id = pthread_self();
 
+	
+	fp = fopen("results-ref.txt", "w");
 	while(!done){
 		while(a_conv_info.Q->q_size > 0){
 			pthread_mutex_lock(&lock);
+			// if queue is empty block until new item or all parser threads have terminated
 			while(q_is_empty(a_conv_info.Q) == 1){
 				pthread_cond_wait(&needs_more, &lock);
 			}
+
+			domain = a_conv_info.Q->q_array[a_conv_info.Q->head];
+			// query the IP Address
+			if(dnslookup(domain, ipstr, strlen(domain)) == UTIL_FAILURE){
+				strncpy(ipstr, "", sizeof(ipstr));
+			}
+			printf("%s:%s\n", domain, ipstr);
+	
+			fprintf(fp, "%s,%s\n", domain, ipstr);
+			// remove domain name form queue
 			dequeue(a_conv_info.Q);
 
 			pthread_cond_signal(&needs_less);	
 			pthread_mutex_unlock(&lock);
 		}
 	}
-	// removes the domain name form the shared array
-	//dnslookup(a_conv_info.Q->q_array[a_conv_info.Q->head], NULL, a_conv_info.Q->q_max);
 
-	// query the IP Address
+	fclose(fp);
+
 	// after name has been mapped to IP address write log
-	// if queue is empty block until new item or all parser threads have terminated
 	pthread_exit(0);
 }
 
@@ -89,3 +107,4 @@ char * concat(char * str1, char * str2){
 	strcpy(ret+(strlen(str1)), str2);
 	return ret;
 }
+

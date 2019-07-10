@@ -3,8 +3,8 @@ CC = gcc
 
 LIBS = 
 
-DEPS = fifo_queue.h multi-lookup.h test.h
-OBJS = fifo_queue.o multi-lookup.o test.o main.o
+DEPS = fifo_queue.h multi-lookup.h test.h util.h
+OBJS = fifo_queue.o multi-lookup.o test.o util.o main.o
 
 CFLAGS = -Wall -Wextra -pthread -g
 

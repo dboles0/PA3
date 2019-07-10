@@ -23,11 +23,11 @@ void * parser_thread(void *ptr){
 	// add root file to file to service
 	file_path = concat(root, a_psr_info.file_name);	
 
+	pthread_mutex_lock(&lock);
 	fp = fopen(file_path, "r");
 	if(fp == NULL){ printf("error - opening file\n"); }
 	while(!feof(fp)){	
 
-		pthread_mutex_lock(&lock);
 
 
 		while(q_is_full(a_psr_info.Q) == 1){
@@ -40,20 +40,24 @@ void * parser_thread(void *ptr){
 		str[i-1] = '\0';
 		enqueue(a_psr_info.Q, str);
 
-		pthread_cond_signal(&needs_more);	
-		pthread_mutex_unlock(&lock);
+		
+
 			
 	}
+	pthread_cond_signal(&needs_more);	
+	pthread_mutex_unlock(&lock);
 	if(!feof(fp)){
 		perror("EOF error");
 	}	
 	// close file
 	fclose(fp);
 
-	// free all information instide the struct
-	free(file_path);
-	free(a_psr_info.file_name);
+	pthread_mutex_lock(&psr_out_lock);
+	fprintf(a_psr_info.psr_out_fp, "<%i> thread serviced %i files\n", a_psr_info.thread_id, a_psr_info.num_files_serviced);
+	pthread_mutex_unlock(&psr_out_lock);
 
+
+	free(file_path);
 	files_serviced += 1;
 	if(files_serviced == a_psr_info.num_input_files){ done = true; } 
 	// validate buffer has correct numbrer of elements
@@ -71,8 +75,11 @@ void * converter_thread(void *ptr){
 	
 	fp = fopen("results-ref.txt", "w");
 	while(!done){
+		
+		pthread_mutex_lock(&c_lock);
 		while(a_conv_info.Q->q_size > 0){
 			pthread_mutex_lock(&lock);
+
 			// if queue is empty block until new item or all parser threads have terminated
 			while(q_is_empty(a_conv_info.Q) == 1){
 				pthread_cond_wait(&needs_more, &lock);
@@ -85,13 +92,14 @@ void * converter_thread(void *ptr){
 			}
 			printf("%s:%s\n", domain, ipstr);
 	
-			fprintf(fp, "%s,%s\n", domain, ipstr);
+			fprintf(fp, "%s, %s\n", domain, ipstr);
 			// remove domain name form queue
 			dequeue(a_conv_info.Q);
 
 			pthread_cond_signal(&needs_less);	
 			pthread_mutex_unlock(&lock);
 		}
+		pthread_mutex_unlock(&c_lock);
 	}
 
 	fclose(fp);

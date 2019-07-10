@@ -1,1 +1,0 @@
-# after finishing all files thread logs | Thread <thread id> serviced ### files. (id = pthread_self())

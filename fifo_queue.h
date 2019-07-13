@@ -21,6 +21,7 @@
 #include <errno.h>                     // handeling file error check
 #include <unistd.h>                    // usleep, 
 #include <stdbool.h>                   
+#include <sys/time.h>     	       // gettimeofday              
 
 #define MIN_ARGS 1
 #define MAX_INPUT_FILES 10
@@ -35,6 +36,7 @@ struct fifo_Q{
 };
 
 struct fifo_Q * create_queue(unsigned q_max);
+void delete_queue(struct fifo_Q * a_queue);
 int enqueue(struct fifo_Q * a_queue, char * entry);
 void dequeue(struct fifo_Q * a_queue);
 int q_is_empty(struct fifo_Q * a_queue);

@@ -12,12 +12,19 @@ struct fifo_Q * create_queue(unsigned q_max){
 	queue->head = -1;
 	queue->tail = -1;
 	queue->q_array = (char **) malloc(q_max * sizeof(char));
-	queue->q_array[q_max] = NULL; 
 	for(int i=0; i< queue->q_max; i++){
 		queue->q_array[i] = copy("0");
 	}
 	queue->q_array[q_max] = NULL; 
 	return queue;
+}
+
+void delete_queue(struct fifo_Q * q){
+	
+	for(int i=0; i< q->q_max; i++){
+		free(q->q_array[i]);
+	}
+	free(q);
 }
 
 // if return == 1 the queue is empty

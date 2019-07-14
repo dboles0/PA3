@@ -1,1 +1,2 @@
-# after finishing all files thread logs | Thread <thread id> serviced ### files. (id = pthread_self())
+<179222272> thread produced 1 threads
+<170829568> thread produced 1 threads

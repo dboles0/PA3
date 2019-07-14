@@ -13,6 +13,8 @@
 #include "fifo_queue.h"
 
 extern pthread_mutex_t lock;
+extern pthread_mutex_t psr_log_lock;
+extern pthread_mutex_t test_lock;
 extern pthread_cond_t needs_less;
 extern pthread_cond_t needs_more;
 extern bool done; 
@@ -23,7 +25,8 @@ struct parser_info{
 	int num_files_serviced;
 	int num_input_files;
 	struct fifo_Q * Q;		
-	char * file_name;
+	FILE * fp;
+	FILE * psr_log_fp;
 
 };
 

@@ -9,9 +9,7 @@
 void * parser_thread(void *ptr){
 	
 	struct parser_info a_psr_info = *((struct parser_info *) ptr);
-	FILE * fp;
-	char * root = "input/";
-	char * file_path;
+	FILE * fp = a_psr_info.fp;
 	int i;
 	
 	char str[MAX_NAME_LENGTH];                         // string read form file
@@ -21,15 +19,11 @@ void * parser_thread(void *ptr){
 
 	// pthread_mutex_lock(&lock);
 	// add root file to file to service
-	file_path = concat(root, a_psr_info.file_name);	
 
-	fp = fopen(file_path, "r");
 	if(fp == NULL){ printf("error - opening file\n"); }
-	while(!feof(fp)){	
+	while(!feof(fp)){
 
 		pthread_mutex_lock(&lock);
-
-
 		while(q_is_full(a_psr_info.Q) == 1){
 			pthread_cond_wait(&needs_less, &lock);
 		}
@@ -42,20 +36,20 @@ void * parser_thread(void *ptr){
 
 		pthread_cond_signal(&needs_more);	
 		pthread_mutex_unlock(&lock);
-			
+
 	}
 	if(!feof(fp)){
 		perror("EOF error");
 	}	
-	// close file
-	fclose(fp);
 
-	// free all information instide the struct
-	free(file_path);
-	free(a_psr_info.file_name);
 
 	files_serviced += 1;
 	if(files_serviced == a_psr_info.num_input_files){ done = true; } 
+
+	pthread_mutex_lock(&psr_log_lock);
+	fprintf(a_psr_info.psr_log_fp, "<%d> thread serviced %d files\n", a_psr_info.thread_id, a_psr_info.num_files_serviced);
+	pthread_mutex_unlock(&psr_log_lock);
+
 	// validate buffer has correct numbrer of elements
 	pthread_exit(0);
 }
@@ -65,32 +59,33 @@ void * converter_thread(void *ptr){
 	FILE * fp;
 	struct converter_info a_conv_info = *((struct converter_info *) ptr);
 	char ipstr[MAX_IP_LENGTH];                                             // ip address
-	char * domain; 
+	char * url;
 	a_conv_info.thread_id = pthread_self();
 
 	
-	fp = fopen("results-ref.txt", "w");
 	while(!done){
+		pthread_mutex_lock(&lock);
+		fp = fopen("results-ref.txt", "w");
 		while(a_conv_info.Q->q_size > 0){
-			pthread_mutex_lock(&lock);
 			// if queue is empty block until new item or all parser threads have terminated
 			while(q_is_empty(a_conv_info.Q) == 1){
 				pthread_cond_wait(&needs_more, &lock);
 			}
 
-			domain = a_conv_info.Q->q_array[a_conv_info.Q->head];
+			url = a_conv_info.Q->q_array[a_conv_info.Q->head];
 			// query the IP Address
-			if(dnslookup(domain, ipstr, strlen(domain)) == UTIL_FAILURE){
+			if(dnslookup(url, ipstr, sizeof(ipstr)) == UTIL_FAILURE){
 				strncpy(ipstr, "", sizeof(ipstr));
 			}
-			printf("%s:%s\n", domain, ipstr);
+			printf("%s:%s\n", url, ipstr);
 	
-			fprintf(fp, "%s,%s\n", domain, ipstr);
+			fprintf(fp, "%s,%s\n", url, ipstr);
 			// remove domain name form queue
 			dequeue(a_conv_info.Q);
 
 			pthread_cond_signal(&needs_less);	
 			pthread_mutex_unlock(&lock);
+
 		}
 	}
 
